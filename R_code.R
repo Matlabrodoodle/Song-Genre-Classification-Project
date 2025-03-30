@@ -676,7 +676,7 @@ tic("SMS Model Training")
 
 # Train a ham-spam classifier using SMS data to serve as a performance baseline
 SMS_Classifier <- train(Label~.,
-                        data=SMS_train_data,#[,-c(2)], # Drop ID column
+                        data=SMS_train_data[,-c(2)], # Drop ID column
                         method="rpart",
                         metric="Kappa",
                         trControl=SMS_CV_control,
