@@ -14,21 +14,14 @@
 # https://archive.ics.uci.edu/dataset/228/sms+spam+collection
 
 
-
-
-## WARNING ##
+## NOTE ##
 
 # This code is designed to run without any preexisting R libraries or data downloaded,
 # and consequently it will take a long time to run (expect at least an hour).
 # Due to the size of the data it is advised to run the code on a machine with at least
 # 32 GB of RAM. 
 
-# Please also note that model training makes use of parallel processing 
-# using the doSNOW library. For convenience I define num_cores immediately below
-# and set it according to my processor's specifications. Please ensure before proceeding
-# that this variable is set for a number of cores that is appropriate for your computer.
 
-num_cores <- 18 # SET APPROPRIATELY FOR YOUR PROCESSOR
 
 
 
@@ -54,6 +47,10 @@ if(!require(doSNOW)){
   install.packages("doSNOW", repos = "http://cran.us.r-project.org")
 }
 
+if(!require(parallel)){
+  install.packages("parallel", repos = "http://cran.us.r-project.org")
+}
+
 if(!require(quanteda)){
   install.packages("quanteda", repos = "http://cran.us.r-project.org")
 }
@@ -77,6 +74,8 @@ library(caret)
 library(tictoc)
 
 library(doSNOW)
+
+library(parallel)
 
 library(quanteda)
 
@@ -663,11 +662,10 @@ setDF(SMS_train_data)
 SMS_CV_folds <- createMultiFolds(SMS_train_data$Label,k=10,times=3)
 SMS_CV_control <- trainControl(method="repeatedcv",number=10,repeats=3,index=SMS_CV_folds,search="random")
 
-# Allocate additional CPU cores using doSNOW
-
-### WARNING: Please ensure core allocation is appropriate for your machine! ###
-
-CL <- makeCluster(num_cores,type="SOCK")
+# Allocate additional CPU cores using doSNOW and parallel libraries
+# Dynamically count cores and use all except one to avoid overloading
+num_cores <- detectCores()
+CL <- makeCluster(num_cores[1]-1,type="SOCK")
 
 # Register cluster
 registerDoSNOW(CL)
