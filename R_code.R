@@ -1,5 +1,5 @@
 
-### Song Genre Bag of Words Classification Project ###
+### Song Genre Classification Project ###
 
 # Written by Alvito DiStefano
 
@@ -432,6 +432,9 @@ toc()
 # Show data head
 head(song_data)
 
+# Save song_data to file
+save(song_data,file="song_data.RData")
+
 
 ## EDA ##
 
@@ -482,6 +485,7 @@ barplot(genre_percents,
         ylab = "Genre Percent Representation in Song Data",
         names.arg=tools::toTitleCase(substring(colnames(song_data)[2:9],4)),
         main = "Genre Percentage in Data",
+        las=2
         )
 
 
@@ -557,10 +561,13 @@ rm(train_tokens_dfm)
 rm(train_tokens_matrix)
 
 # Rename column titled "data" (otherwise it will cause errors)
-names(SMS_data)[names(SMS_data)=="data"]<-"data_d"
+names(SMS_data)[names(SMS_data)=="data"]<-"data_"
 
 # Clean up column names and make them unique
 names(SMS_data)<-make.names(names(SMS_data),unique=TRUE)
+
+# Save to file
+save(SMS_data,file="SMS_data.RData")
 
 
 ## TRAINING AND HOLDOUT DATASET PREPARATION ##
@@ -732,6 +739,7 @@ stopCluster(CL)
 
 
 tic("Generate results")
+
 # Create dataframe to store results
 results_table <- data.frame(
   Case = character(),
@@ -799,7 +807,9 @@ for (genre in genre_list){
   
 }
 
-# Print final results
+# Print and save final results
 print(results_table,row.names = FALSE)
+
+save(results_table,file="results_table.RData")
 
 toc()
